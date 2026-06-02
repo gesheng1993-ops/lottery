@@ -85,7 +85,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
   <div class="dish-list" id="dishList"></div>
 
   <!-- 抽奖入口 -->
-  <div class="luck-entry" id="luckEntry" onclick="showPhoneModal()">
+  <div class="luck-entry" id="luckEntry" onclick="goToGame()">
     <div class="luck-icon">🎉</div>
     <h3>幸运抽奖</h3>
     <p>点击参与店内幸运抽奖~</p>
@@ -95,18 +95,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
   <div class="footer">
     到店出示即可使用 · 详询店内工作人员<br>
     逃跑抄手 · 用心做好每一碗抄手
-  </div>
-</div>
-
-<!-- 手机号弹窗 -->
-<div class="modal-overlay hidden" id="phoneModal">
-  <div class="modal-box">
-    <h3>📱 输入手机号</h3>
-    <p class="sub">作为领取凭证，每日可抽1次</p>
-    <input type="tel" id="phoneInput" placeholder="请输入手机号" maxlength="11">
-    <div class="modal-error" id="phoneError"></div>
-    <button class="btn" onclick="submitPhone()">开始抽奖</button>
-    <button class="skip" onclick="closePhoneModal()">稍后再说</button>
   </div>
 </div>
 
@@ -126,7 +114,6 @@ var ALL_DISHES = [
   document.getElementById('todayDate').textContent =
     d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 · 星期' + week[d.getDay()];
 
-  // 根据日期轮换展示3道菜（从当天索引开始取3道）
   var startIdx = (d.getDate() + d.getMonth()) % ALL_DISHES.length;
   var dishes = [];
   for (var i = 0; i < 3; i++) {
@@ -146,54 +133,15 @@ var ALL_DISHES = [
   document.getElementById('dishList').innerHTML = dishHtml;
 })();
 
-// 手机号弹窗
-function showPhoneModal(){
-  var saved = localStorage.getItem('_luid');
-  if (saved) {
-    window.location.href = '/game?uid=' + encodeURIComponent(saved);
-    return;
+// 直接进入游戏，使用设备标识
+function goToGame(){
+  var uid = localStorage.getItem('_luid');
+  if (!uid) {
+    uid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
+    localStorage.setItem('_luid', uid);
   }
-  document.getElementById('phoneModal').classList.remove('hidden');
-  document.getElementById('phoneInput').focus();
+  window.location.href = '/game?uid=' + encodeURIComponent(uid);
 }
-
-function closePhoneModal(){
-  document.getElementById('phoneModal').classList.add('hidden');
-}
-
-function submitPhone(){
-  var phone = document.getElementById('phoneInput').value.trim();
-  var errEl = document.getElementById('phoneError');
-  if (!/^1[3-9]\d{9}$/.test(phone)) {
-    errEl.textContent = '请输入正确的11位手机号';
-    return;
-  }
-  errEl.textContent = '';
-
-  fetch('/api/register', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({phone: phone})
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    if (data.code === 0) {
-      localStorage.setItem('_luid', data.data.user_id);
-      localStorage.setItem('_lphone', phone);
-      window.location.href = '/game?uid=' + encodeURIComponent(data.data.user_id);
-    } else {
-      errEl.textContent = data.message || '注册失败，请重试';
-    }
-  })
-  .catch(function(){
-    errEl.textContent = '网络错误，请检查连接';
-  });
-}
-
-// 回车提交
-document.getElementById('phoneInput').addEventListener('keydown', function(e){
-  if (e.key === 'Enter') submitPhone();
-});
 </script>
 </body>
 </html>

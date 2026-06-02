@@ -132,7 +132,7 @@ var STATE = {
 };
 
 // 奖品对应的轮盘颜色
-var SEGMENT_COLORS = ['#FF4444','#FF8C00','#FFB300','#FF6D00','#FF9800','#FFC107','#e0d5cc','#f0f0f0'];
+var API_BASE = 'https://api.taopaolucky.site';
 var SEGMENT_LABELS = ['20元券','10元券','小菜','小菜','10元券','小菜','谢谢参与','谢谢参与'];
 
 // ====== 初始化 ======
@@ -162,8 +162,8 @@ function init(){
 // ====== 加载状态 ======
 function loadStatus(){
   Promise.all([
-    fetch('/api/pool-status').then(function(r){return r.json()}),
-    fetch('/api/user-status?user_id=' + encodeURIComponent(STATE.userId)).then(function(r){return r.json()})
+    fetch(API_BASE+'/api/pool-status').then(function(r){return r.json()}),
+    fetch(API_BASE+'/api/user-status?user_id=' + encodeURIComponent(STATE.userId)).then(function(r){return r.json()})
   ]).then(function(results){
     var poolData = results[0];
     var userData = results[1];
@@ -266,7 +266,7 @@ function spinWheel(){
   btn.textContent = '...';
 
   // 先请求后端抽奖
-  fetch('/api/draw', {
+  fetch(API_BASE+'/api/draw', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({user_id: STATE.userId})
