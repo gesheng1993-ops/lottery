@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>逃跑抄手 · 今日推荐</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f4f7fc;color:#3e2723;min-height:100vh;overflow-x:hidden}
+.page{max-width:500px;margin:0 auto;padding:0 0 40px}
+
+/* 顶部品牌区 */
+.hero{background:linear-gradient(135deg,#BF360C 0%,#1565C0 50%,#1E88E5 100%);padding:28px 20px 24px;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:-20px;left:0;right:0;height:40px;background:#f4f7fc;border-radius:50% 50% 0 0}
+.hero .brand{font-size:15px;color:rgba(255,255,255,.75);letter-spacing:4px;margin-bottom:4px}
+.hero h1{font-size:26px;color:#fff;font-weight:700;letter-spacing:2px;margin-bottom:6px}
+.hero .tagline{font-size:13px;color:rgba(255,255,255,.8)}
+
+/* 日期标签 */
+.date-badge{text-align:center;margin:8px 0 16px}
+.date-badge span{display:inline-block;background:#fff;border:1px solid #e0d5cc;border-radius:20px;padding:6px 18px;font-size:12px;color:#8d6e63}
+
+/* 板块标题 */
+.section-title{display:flex;align-items:center;gap:8px;padding:0 20px;margin:20px 0 12px}
+.section-title .icon{font-size:22px}
+.section-title h2{font-size:17px;font-weight:700;color:#4e342e}
+.section-title .line{flex:1;height:1px;background:#e0d5cc}
+
+/* 推荐菜品卡片 */
+.dish-list{padding:0 16px}
+.dish-card{display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:transform .2s}
+.dish-card:active{transform:scale(.98)}
+.dish-emoji{width:64px;height:64px;background:#E3F2FD;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0}
+.dish-info{flex:1;min-width:0}
+.dish-info h3{font-size:15px;font-weight:600;margin-bottom:2px}
+.dish-info .desc{font-size:12px;color:#8d6e63;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dish-tag{display:inline-block;background:#E3F2FD;color:#1565C0;font-size:10px;padding:2px 8px;border-radius:10px;margin-top:4px}
+
+/* 今日好运入口 */
+.luck-entry{margin:24px 16px;background:linear-gradient(135deg,#E8F0FE,#E3F2FD);border:2px dashed #90CAF9;border-radius:16px;padding:20px;text-align:center;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.luck-entry:active{transform:scale(.97);background:#E3F2FD}
+.luck-entry .luck-icon{font-size:40px;margin-bottom:8px;animation:bounce 2s infinite}
+.luck-entry h3{font-size:18px;color:#1565C0;margin-bottom:4px}
+.luck-entry p{font-size:13px;color:#8d6e63}
+.luck-entry .arrow{display:inline-block;margin-top:8px;font-size:20px;color:#1565C0;animation:arrowPulse 1.5s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes arrowPulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* 底部 */
+.footer{text-align:center;padding:20px;color:#bcaaa4;font-size:11px;line-height:1.6}
+
+/* 手机号弹窗 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal-box{background:#fff;border-radius:16px;padding:28px 24px;width:100%;max-width:340px;text-align:center}
+.modal-box h3{font-size:18px;margin-bottom:4px}
+.modal-box .sub{font-size:12px;color:#8d6e63;margin-bottom:16px}
+.modal-box input{width:100%;padding:12px 14px;border:1px solid #e0d5cc;border-radius:10px;font-size:16px;text-align:center;outline:none;margin-bottom:12px}
+.modal-box input:focus{border-color:#1565C0}
+.modal-box .btn{display:block;width:100%;padding:12px;border:none;border-radius:10px;background:#1565C0;color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.modal-box .btn:active{opacity:.85}
+.modal-box .skip{display:block;margin-top:12px;font-size:12px;color:#bcaaa4;cursor:pointer;background:none;border:none;width:100%;text-align:center}
+.modal-error{color:#ef4444;font-size:12px;min-height:18px;margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <!-- 品牌头部 -->
+  <div class="hero">
+    <div class="brand">· 逃跑抄手 ·</div>
+    <h1>今日店长推荐</h1>
+    <div class="tagline">每日精选 · 新鲜现做</div>
+  </div>
+
+  <!-- 日期 -->
+  <div class="date-badge">
+    <span id="todayDate"></span>
+  </div>
+
+  <!-- 推荐菜品（每日轮换） -->
+  <div class="section-title">
+    <span class="icon">🍜</span><h2>今日主厨推荐</h2><span class="line"></span>
+  </div>
+  <div class="dish-list" id="dishList"></div>
+
+  <!-- 抽奖入口 -->
+  <div class="luck-entry" id="luckEntry" onclick="showPhoneModal()">
+    <div class="luck-icon">🎉</div>
+    <h3>幸运抽奖</h3>
+    <p>点击参与店内幸运抽奖~</p>
+    <span class="arrow">▼</span>
+  </div>
+
+  <div class="footer">
+    到店出示即可使用 · 详询店内工作人员<br>
+    逃跑抄手 · 用心做好每一碗抄手
+  </div>
+</div>
+
+<!-- 手机号弹窗 -->
+<div class="modal-overlay hidden" id="phoneModal">
+  <div class="modal-box">
+    <h3>📱 输入手机号</h3>
+    <p class="sub">作为领取凭证，每日可抽1次</p>
+    <input type="tel" id="phoneInput" placeholder="请输入手机号" maxlength="11">
+    <div class="modal-error" id="phoneError"></div>
+    <button class="btn" onclick="submitPhone()">开始抽奖</button>
+    <button class="skip" onclick="closePhoneModal()">稍后再说</button>
+  </div>
+</div>
+
+<script>
+// 每日轮换菜品
+var ALL_DISHES = [
+  {emoji:'🥟',name:'甜酸辣抄手',desc:'酸甜开胃 · 辣味十足 · 手工现包',tag:'🔥 今日主打'},
+  {emoji:'🍲',name:'火锅抄手',desc:'麻辣鲜香 · 火锅汤底 · 料足味浓',tag:'⭐ 人气推荐'},
+  {emoji:'🍜',name:'酸菜肉丝面',desc:'酸爽可口 · 肉丝鲜嫩 · 手工面条',tag:'👍 经典之选'},
+  {emoji:'🍚',name:'卤肉饭',desc:'卤汁浓郁 · 肥而不腻 · 配时蔬',tag:'🍖 饱腹首选'},
+  {emoji:'🥘',name:'番茄玉米大骨汤抄手',desc:'浓郁骨汤 · 酸甜番茄 · 营养满分',tag:'💛 招牌汤品'}
+];
+
+(function(){
+  var d = new Date();
+  var week = ['日','一','二','三','四','五','六'];
+  document.getElementById('todayDate').textContent =
+    d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 · 星期' + week[d.getDay()];
+
+  // 根据日期轮换展示3道菜（从当天索引开始取3道）
+  var startIdx = (d.getDate() + d.getMonth()) % ALL_DISHES.length;
+  var dishes = [];
+  for (var i = 0; i < 3; i++) {
+    dishes.push(ALL_DISHES[(startIdx + i) % ALL_DISHES.length]);
+  }
+  var dishHtml = '';
+  dishes.forEach(function(dish){
+    dishHtml += '<div class="dish-card">' +
+      '<div class="dish-emoji">' + dish.emoji + '</div>' +
+      '<div class="dish-info">' +
+        '<h3>' + dish.name + '</h3>' +
+        '<div class="desc">' + dish.desc + '</div>' +
+        '<span class="dish-tag">' + dish.tag + '</span>' +
+      '</div>' +
+    '</div>';
+  });
+  document.getElementById('dishList').innerHTML = dishHtml;
+})();
+
+// 手机号弹窗
+function showPhoneModal(){
+  var saved = localStorage.getItem('_luid');
+  if (saved) {
+    window.location.href = '/game?uid=' + encodeURIComponent(saved);
+    return;
+  }
+  document.getElementById('phoneModal').classList.remove('hidden');
+  document.getElementById('phoneInput').focus();
+}
+
+function closePhoneModal(){
+  document.getElementById('phoneModal').classList.add('hidden');
+}
+
+function submitPhone(){
+  var phone = document.getElementById('phoneInput').value.trim();
+  var errEl = document.getElementById('phoneError');
+  if (!/^1[3-9]\d{9}$/.test(phone)) {
+    errEl.textContent = '请输入正确的11位手机号';
+    return;
+  }
+  errEl.textContent = '';
+
+  fetch('/api/register', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({phone: phone})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (data.code === 0) {
+      localStorage.setItem('_luid', data.data.user_id);
+      localStorage.setItem('_lphone', phone);
+      window.location.href = '/game?uid=' + encodeURIComponent(data.data.user_id);
+    } else {
+      errEl.textContent = data.message || '注册失败，请重试';
+    }
+  })
+  .catch(function(){
+    errEl.textContent = '网络错误，请检查连接';
+  });
+}
+
+// 回车提交
+document.getElementById('phoneInput').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') submitPhone();
+});
+</script>
+</body>
+</html>

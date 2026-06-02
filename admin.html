@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>后台管理 · 抽奖系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f5f5f5;color:#333;line-height:1.6}
+.container{max-width:700px;margin:0 auto;padding:20px}
+.header{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:20px}
+.btn{padding:8px 16px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-primary{background:#1565C0;color:#fff}
+.btn-danger{background:#ef4444;color:#fff}
+.btn-outline{background:#fff;color:#1565C0;border:1px solid #1565C0}
+.btn:active{opacity:.85}
+
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card h2{font-size:16px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #f0f0f0}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+table th{text-align:left;padding:8px;background:#fafafa;border-bottom:2px solid #e5e7eb;font-weight:600}
+table td{padding:8px;border-bottom:1px solid #f0f0f0}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-ok{background:#d1fae5;color:#065f46}
+.badge-empty{background:#fee2e2;color:#991b1b}
+.badge-sun{background:#e5e7eb;color:#6b7280}
+
+.stats-row{display:flex;gap:12px;margin-bottom:16px}
+.stat-card{flex:1;background:#fff;border-radius:10px;padding:16px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.stat-card .num{font-size:28px;font-weight:700;color:#1565C0}
+.stat-card .label{font-size:12px;color:#8d6e63;margin-top:2px}
+
+.form-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.form-row label{width:100px;font-size:13px;flex-shrink:0}
+.form-row input,.form-row select{flex:1;padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;font-size:13px;outline:none}
+.form-row input:focus{border-color:#1565C0}
+
+.login-overlay{position:fixed;inset:0;background:#f5f5f5;display:flex;align-items:center;justify-content:center;z-index:999}
+.login-box{background:#fff;border-radius:16px;padding:32px 24px;box-shadow:0 10px 25px rgba(0,0,0,.1);width:100%;max-width:320px;text-align:center}
+.login-box h2{font-size:18px;margin-bottom:16px}
+.login-box input{width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;margin-bottom:10px;text-align:center}
+.login-box input:focus{border-color:#1565C0}
+.login-box .btn{width:100%;padding:10px}
+.login-error{color:#ef4444;font-size:12px;min-height:18px;margin:6px 0}
+
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:8px 20px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.success{background:#10b981}
+.toast.error{background:#ef4444}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>🔐 后台管理登录</h2>
+    <input type="text" id="loginUser" placeholder="用户名" value="admin">
+    <input type="password" id="loginPwd" placeholder="密码">
+    <div class="login-error" id="loginError"></div>
+    <button class="btn btn-primary" onclick="doLogin()">登录</button>
+  </div>
+</div>
+
+<div class="container" id="mainContent" style="display:none">
+  <div class="header">
+    <h1>🎯 抽奖系统后台</h1>
+    <button class="btn btn-outline" onclick="logout()">退出</button>
+  </div>
+
+  <!-- 统计 -->
+  <div class="stats-row" id="statsRow"></div>
+
+  <!-- 奖池状态 -->
+  <div class="card">
+    <h2>📊 当前奖池状态 <span style="font-size:12px;color:#8d6e63;font-weight:400" id="periodLabel"></span></h2>
+    <table><thead><tr>
+      <th>奖品</th><th>等级</th><th>总数</th><th>剩余</th><th>概率</th><th>状态</th>
+    </tr></thead>
+    <tbody id="poolTableBody"></tbody></table>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-danger" onclick="resetPool()">🔄 手动刷新奖池</button>
+    </div>
+  </div>
+
+  <!-- 配置修改 -->
+  <div class="card">
+    <h2>⚙️ 奖池配置</h2>
+    <div class="form-row">
+      <label>每日抽奖次数</label>
+      <input type="number" id="cfgDailyLimit" min="1" max="20">
+    </div>
+    <div class="form-row">
+      <label>刷新时间</label>
+      <input type="time" id="cfgRefreshTime">
+    </div>
+    <div class="form-row">
+      <label>刷新周期</label>
+      <select id="cfgRefreshType">
+        <option value="daily">每天</option>
+        <option value="weekly">每周一</option>
+      </select>
+    </div>
+
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f0">
+      <h3 style="font-size:14px;margin-bottom:8px">奖品概率设置</h3>
+      <div id="cfgPrizes"></div>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-primary" onclick="saveConfig()">💾 保存配置</button>
+    </div>
+  </div>
+
+  <!-- 中奖记录 -->
+  <div class="card">
+    <h2>📋 中奖记录（最近200条）</h2>
+    <div style="max-height:400px;overflow-y:auto">
+    <table><thead><tr>
+      <th>时间</th><th>用户ID</th><th>奖品</th><th>类型</th>
+    </tr></thead>
+    <tbody id="winnersTableBody"></tbody></table>
+    </div>
+  </div>
+
+  <!-- 修改密码 -->
+  <div class="card">
+    <h2>🔑 修改管理员密码</h2>
+    <div class="form-row">
+      <label>新密码</label>
+      <input type="password" id="newPassword" placeholder="至少6位">
+      <button class="btn btn-primary" onclick="changePassword()">修改</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var ADMIN_TOKEN = sessionStorage.getItem('_atk') || '';
+
+function showToast(msg, type){
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + (type||'') + ' show';
+  clearTimeout(t._t); t._t = setTimeout(function(){ t.className = 'toast'; }, 2000);
+}
+
+function api(path, opts){
+  opts = opts || {};
+  var headers = opts.headers || {};
+  if (ADMIN_TOKEN) headers['X-Admin-Token'] = ADMIN_TOKEN;
+  headers['Content-Type'] = 'application/json';
+  return fetch(path, {method: opts.method||'GET', headers: headers, body: opts.body})
+    .then(function(r){ return r.json(); });
+}
+
+// 登录
+function doLogin(){
+  var u = document.getElementById('loginUser').value.trim();
+  var p = document.getElementById('loginPwd').value.trim();
+  var err = document.getElementById('loginError');
+  if (!u || !p) { err.textContent = '请输入用户名和密码'; return; }
+  api('/api/admin/login', {
+    method: 'POST',
+    body: JSON.stringify({username:u, password:p})
+  }).then(function(d){
+    if (d.code===0){
+      ADMIN_TOKEN = d.data.token;
+      sessionStorage.setItem('_atk', ADMIN_TOKEN);
+      document.getElementById('loginOverlay').style.display='none';
+      document.getElementById('mainContent').style.display='block';
+      loadAll();
+    } else {
+      err.textContent = d.message || '登录失败';
+    }
+  });
+}
+document.getElementById('loginPwd').addEventListener('keydown', function(e){
+  if (e.key==='Enter') doLogin();
+});
+
+// 已登录则自动跳过
+if (ADMIN_TOKEN) {
+  document.getElementById('loginOverlay').style.display='none';
+  document.getElementById('mainContent').style.display='block';
+  loadAll();
+}
+
+function logout(){
+  sessionStorage.removeItem('_atk');
+  ADMIN_TOKEN = '';
+  location.reload();
+}
+
+function loadAll(){
+  loadStats();
+  loadPool();
+  loadWinners();
+}
+
+// 统计
+function loadStats(){
+  api('/api/admin/stats').then(function(d){
+    if (d.code!==0) return;
+    var s = d.data;
+    document.getElementById('statsRow').innerHTML =
+      '<div class="stat-card"><div class="num">'+s.total_draws+'</div><div class="label">总抽奖次数</div></div>'+
+      '<div class="stat-card"><div class="num">'+s.today_draws+'</div><div class="label">今日抽奖</div></div>'+
+      '<div class="stat-card"><div class="num">'+s.total_winners+'</div><div class="label">真实中奖</div></div>';
+  });
+}
+
+// 奖池
+function loadPool(){
+  api('/api/admin/pool').then(function(d){
+    if (d.code!==0) return;
+    var data = d.data;
+    document.getElementById('periodLabel').textContent = '周期: ' + (data.period_key||'--');
+
+    var html = '';
+    (data.prizes||[]).forEach(function(p){
+      var statusBadge = p.remaining > 0
+        ? '<span class="badge badge-ok">剩余'+p.remaining+'</span>'
+        : '<span class="badge badge-empty">已抽完</span>';
+      html += '<tr><td>'+p.name+'</td><td>'+p.level+'等奖</td><td>'+p.total_count+'</td><td>'+p.remaining+'</td><td>'+(p.probability*100).toFixed(2)+'%</td><td>'+statusBadge+'</td></tr>';
+    });
+    document.getElementById('poolTableBody').innerHTML = html;
+
+    // 填充配置表单
+    var cfg = data.config;
+    document.getElementById('cfgDailyLimit').value = cfg.daily_draw_limit;
+    document.getElementById('cfgRefreshTime').value = cfg.refresh_time;
+    document.getElementById('cfgRefreshType').value = cfg.refresh_type;
+    
+
+    var prizeCfgHtml = '';
+    (cfg.prizes||[]).forEach(function(p, i){
+      prizeCfgHtml += '<div class="form-row" style="margin-bottom:4px">'+
+        '<label>'+p.name+'</label>'+
+        '<span style="font-size:11px;color:#8d6e63;width:40px">概率</span>'+
+        '<input type="number" step="0.001" min="0" max="1" value="'+p.probability+'" id="cfgProb'+i+'" style="width:80px">'+
+        '<span style="font-size:11px;color:#8d6e63;width:40px">数量</span>'+
+        '<input type="number" min="0" max="100" value="'+p.total_count+'" id="cfgCount'+i+'" style="width:60px">'+
+      '</div>';
+    });
+    document.getElementById('cfgPrizes').innerHTML = prizeCfgHtml;
+  });
+}
+
+// 中奖记录
+function loadWinners(){
+  api('/api/admin/winners').then(function(d){
+    if (d.code!==0) return;
+    var html = '';
+    (d.data||[]).forEach(function(w){
+      var typeBadge = w.is_sunshine
+        ? '<span class="badge badge-sun">阳光普照</span>'
+        : '<span class="badge badge-ok">真实中奖</span>';
+      html += '<tr><td>'+w.win_time+'</td><td style="font-family:monospace;font-size:11px">'+w.user_id.substr(0,12)+'...</td><td>'+w.prize_name+'</td><td>'+typeBadge+'</td></tr>';
+    });
+    document.getElementById('winnersTableBody').innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:#8d6e63">暂无记录</td></tr>';
+  });
+}
+
+// 重置奖池
+function resetPool(){
+  if (!confirm('确定要手动刷新奖池吗？所有奖品数量将重置。')) return;
+  api('/api/admin/reset-pool', {method:'POST'}).then(function(d){
+    showToast(d.message||'已重置', 'success');
+    loadAll();
+  });
+}
+
+// 保存配置
+function saveConfig(){
+  if (!confirm('确定保存配置？保存后将自动刷新奖池。')) return;
+  var prizes = [];
+  var prizeNames = ['20元代金券','10元代金券','任意小菜一份'];
+  for (var i=0; i<3; i++){
+    prizes.push({
+      probability: parseFloat(document.getElementById('cfgProb'+i).value) || 0,
+      total_count: parseInt(document.getElementById('cfgCount'+i).value) || 1
+    });
+  }
+
+  var data = {
+    daily_draw_limit: parseInt(document.getElementById('cfgDailyLimit').value) || 3,
+    refresh_time: document.getElementById('cfgRefreshTime').value || '10:00',
+    refresh_type: document.getElementById('cfgRefreshType').value || 'daily',
+    prizes: prizes
+  };
+
+  api('/api/admin/config', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }).then(function(d){
+    if (d.code===0){
+      showToast('配置已保存，奖池已刷新', 'success');
+      loadAll();
+    } else {
+      showToast(d.message||'保存失败', 'error');
+    }
+  });
+}
+
+// 修改密码
+function changePassword(){
+  var pwd = document.getElementById('newPassword').value.trim();
+  if (pwd.length < 6) { showToast('密码至少6位', 'error'); return; }
+  api('/api/admin/change-password', {
+    method: 'POST',
+    body: JSON.stringify({new_password: pwd})
+  }).then(function(d){
+    showToast(d.message||'已修改', 'success');
+    document.getElementById('newPassword').value = '';
+  });
+}
+</script>
+</body>
+</html>
