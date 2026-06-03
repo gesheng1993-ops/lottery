@@ -9,155 +9,155 @@
 body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:#f4f7fc;color:#3e2723;min-height:100vh;overflow-x:hidden}
 .page{max-width:500px;margin:0 auto;padding:0 0 30px}
 
-/* 顶部 */
 .header{background:linear-gradient(135deg,#0D47A1,#1565C0);padding:20px;text-align:center;position:relative}
 .header .back{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#fff;font-size:14px;text-decoration:none;opacity:.8}
 .header .brand{font-size:12px;color:rgba(255,255,255,.7);letter-spacing:4px}
 .header h1{font-size:20px;color:#fff;font-weight:700;margin:4px 0}
 .header .sub{font-size:12px;color:rgba(255,255,255,.8)}
 
-
-/* 状态栏 */
-.status-bar{display:flex;justify-content:space-between;align-items:center;padding:0 20px;margin-bottom:16px;font-size:13px;color:#8d6e63}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:0 20px;margin:16px 0 12px;font-size:13px;color:#8d6e63}
 .status-bar .count{font-weight:600;color:#1565C0}
 
-/* ====== 大转盘 ====== */
-.wheel-container{position:relative;width:360px;height:360px;margin:0 auto 20px}
-.wheel-container canvas{width:100%;height:100%}
-.wheel-pointer{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:32px;z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
-.wheel-btn{display:block;width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#1E88E5,#1565C0);color:#fff;font-size:16px;font-weight:700;border:4px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.2);cursor:pointer;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3}
-.wheel-btn:active{transform:translate(-50%,-50%) scale(.95)}
-.wheel-btn.disabled{opacity:.6;pointer-events:none}
+/* 翻牌区域 */
+.cards-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 20px;margin:0 auto;max-width:380px}
+.card-wrap{perspective:600px;aspect-ratio:3/4}
+.card-inner{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;cursor:pointer}
+.card-inner:active{transform:scale(.95)}
+.card-inner.flipped{transform:rotateY(180deg)}
+.card-inner.disabled{pointer-events:none}
+.card-front,.card-back{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.card-front{background:linear-gradient(135deg,#1565C0,#0D47A1);border:3px solid #90CAF9;color:#fff;font-size:28px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.card-front .qmark{font-size:36px;font-weight:700;opacity:.9}
+.card-back{background:#fff;border:3px solid #e0d5cc;transform:rotateY(180deg);flex-direction:column;gap:4px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.card-back .c-icon{font-size:32px}
+.card-back .c-name{font-size:11px;font-weight:600;color:#4e342e;text-align:center}
+.card-back.win-card{border-color:#FFD700;background:#FFFDE7}
+.card-back.lose-card{background:#f9f9f9}
+.card-back .c-tag{font-size:10px;padding:2px 8px;border-radius:8px;background:#E3F2FD;color:#1565C0}
 
-
-/* ====== 结果弹窗 ====== */
+/* 结果弹窗 */
 .result-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
 .result-overlay.hidden{display:none}
 .result-box{background:#fff;border-radius:20px;padding:32px 24px 24px;width:100%;max-width:320px;text-align:center;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
 .result-box.win{border:3px solid #FFD700}
-
 .result-icon{font-size:56px;margin-bottom:8px}
 .result-title{font-size:20px;font-weight:700;margin-bottom:4px}
 .result-title.win{color:#1565C0}
-.result-title.sunshine{color:#8d6e63}
+.result-title.lose{color:#8d6e63}
 .result-desc{font-size:13px;color:#8d6e63;margin-bottom:16px;line-height:1.6}
-.result-note{font-size:11px;color:#bcaaa4;margin-bottom:12px}
 .result-btn{display:inline-block;padding:10px 32px;border:none;border-radius:20px;background:#1565C0;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin:4px}
-.result-btn.outline{background:#fff;color:#1565C0;border:1px solid #1565C0}
 .result-btn:active{opacity:.85}
 @keyframes popIn{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
 
-/* 手机号栏 */
-.phone-bar{padding:0 20px;margin-bottom:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#8d6e63}
-.phone-bar .label{flex-shrink:0}
-.phone-bar .phone-text{font-weight:600;color:#4e342e}
-.phone-bar .change-btn{font-size:11px;color:#1565C0;cursor:pointer;background:none;border:none;text-decoration:underline}
-
-/* 规则说明 */
-.rules{background:#fff;border-radius:12px;margin:16px 16px;padding:16px;font-size:12px;color:#8d6e63;line-height:1.8}
+.rules{background:#fff;border-radius:12px;margin:16px;padding:16px;font-size:12px;color:#8d6e63;line-height:1.8}
 .rules h3{font-size:13px;color:#4e342e;margin-bottom:4px}
+
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:10px 22px;border-radius:8px;font-size:14px;z-index:200;pointer-events:none;transition:opacity .3s}
 </style>
 </head>
 <body>
 
 <div class="page">
-  <!-- 头部 -->
   <div class="header">
     <a class="back" href="/">&larr; 返回</a>
     <div class="brand">· 逃跑抄手 ·</div>
-    <h1>🎉 幸运大转盘</h1>
-    <div class="sub">每日限量奖品 · 先到先得</div>
+    <h1>🎴 幸运翻牌</h1>
+    <div class="sub">每日限量奖品 · 翻牌试试手气</div>
   </div>
 
-  <!-- 日期 -->
   <div class="date-badge" style="text-align:center;margin:12px 0 4px">
     <span id="gameDate" style="display:inline-block;background:#fff;border:1px solid #e0d5cc;border-radius:20px;padding:6px 18px;font-size:12px;color:#8d6e63"></span>
   </div>
 
-
-  <!-- 状态栏 -->
   <div class="status-bar">
     <span>今日剩余：<span class="count" id="remainCount">--</span> 次</span>
     <span id="poolHint" style="font-size:11px"></span>
   </div>
 
-  <!-- 手机号栏 -->
-  <div class="phone-bar">
-    <span class="label">参与账号：</span>
-    <span class="phone-text" id="phoneText">--</span>
-    <button class="change-btn" onclick="changePhone()">切换</button>
+  <div style="text-align:center;margin-bottom:12px;font-size:13px;color:#8d6e63">
+    👆 点击一张牌翻开
   </div>
 
-  <!-- ====== 大转盘区域 ====== -->
-  <div id="wheelSection">
-    <div class="wheel-container">
-      <div class="wheel-pointer">📍</div>
-      <canvas id="wheelCanvas" width="720" height="720"></canvas>
-      <button class="wheel-btn" id="wheelBtn" onclick="spinWheel()">抽奖</button>
-    </div>
-  </div>
+  <!-- 8张卡片 -->
+  <div class="cards-grid" id="cardsGrid"></div>
 
-
-  <!-- 规则 -->
   <div class="rules">
     <h3>📋 活动规则</h3>
-    1. 每日可参与 <strong>1次</strong> 抽奖<br>
-    2. 奖品数量有限，当日抽完即止<br>
+    1. 每日可参与 <strong>1次</strong> 翻牌<br>
+    2. 奖品每日限量，先到先得<br>
     3. 中奖后<strong>3天内</strong>有效，到店出示即可使用<br>
-    4. 最终解释权归逃跑抄手所有
+    4. 每日限<strong>50人</strong>参与，人满即止<br>
+    5. 最终解释权归逃跑抄手所有
   </div>
 </div>
 
-<!-- 结果弹窗 -->
 <div class="result-overlay hidden" id="resultOverlay">
   <div class="result-box" id="resultBox">
     <div class="result-icon" id="resultIcon"></div>
     <div class="result-title" id="resultTitle"></div>
     <div class="result-desc" id="resultDesc"></div>
-    <div class="result-note" id="resultNote"></div>
     <button class="result-btn" onclick="closeResult()">知道了</button>
-    <button class="result-btn outline" id="drawAgainBtn" onclick="closeResult()" style="display:none">再抽一次</button>
   </div>
 </div>
 
 <script>
-// ====== 全局状态 ======
+var API_BASE = '';
 var STATE = {
   userId: '',
-  phone: '',
   poolStatus: null,
   userDrawCount: 0,
   maxDraws: 1,
   isDrawing: false
 };
 
-// 奖品对应的轮盘颜色
-var API_BASE = '';
-var SEGMENT_COLORS = ['#FF4444','#FF8C00','#FFB300','#FF6D00','#FF9800','#FFC107','#e0d5cc','#f0f0f0'];
-var SEGMENT_LABELS = ['20元券','10元券','小菜','小菜','10元券','小菜','谢谢参与','谢谢参与'];
+var CARD_PRIZES = [
+  {icon:'🎉', name:'20元代金券', color:'#FF4444', isWin:true, level:1},
+  {icon:'🍲', name:'任意小菜一份', color:'#FFD700', isWin:true, level:2},
+  {icon:'🍲', name:'任意小菜一份', color:'#FFD700', isWin:true, level:2},
+  {icon:'😅', name:'谢谢参与', color:'#bcaaa4', isWin:false},
+  {icon:'😅', name:'谢谢参与', color:'#bcaaa4', isWin:false},
+  {icon:'😅', name:'谢谢参与', color:'#bcaaa4', isWin:false},
+  {icon:'😅', name:'谢谢参与', color:'#bcaaa4', isWin:false},
+  {icon:'😅', name:'谢谢参与', color:'#bcaaa4', isWin:false}
+];
 
-// ====== 初始化 ======
 function init(){
   var params = new URLSearchParams(window.location.search);
   STATE.userId = params.get('uid') || localStorage.getItem('_luid') || '';
-  STATE.phone = localStorage.getItem('_lphone') || '';
 
   if (!STATE.userId) {
     window.location.href = '/';
     return;
   }
 
-  // 显示日期
   var d = new Date();
   var week = ['日','一','二','三','四','五','六'];
   document.getElementById('gameDate').textContent =
     d.getFullYear() + '年' + (d.getMonth()+1) + '月' + d.getDate() + '日 · 星期' + week[d.getDay()];
 
-  drawWheel();
+  renderCards();
   loadStatus();
 }
 
-// ====== 加载状态 ======
+function renderCards(){
+  var html = '';
+  // 洗牌：随机排列
+  var shuffled = CARD_PRIZES.slice().sort(function(){ return Math.random() - 0.5; });
+  window._shuffled = shuffled;
+  for (var i = 0; i < shuffled.length; i++) {
+    html += '<div class="card-wrap">' +
+      '<div class="card-inner" id="card' + i + '" onclick="flipCard(' + i + ')">' +
+        '<div class="card-front"><span class="qmark">?</span></div>' +
+        '<div class="card-back ' + (shuffled[i].isWin ? 'win-card' : 'lose-card') + '">' +
+          '<span class="c-icon">' + shuffled[i].icon + '</span>' +
+          '<span class="c-name">' + shuffled[i].name + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  document.getElementById('cardsGrid').innerHTML = html;
+}
+
 function loadStatus(){
   Promise.all([
     fetch(API_BASE+'/api/pool-status').then(function(r){return r.json()}),
@@ -165,16 +165,14 @@ function loadStatus(){
   ]).then(function(results){
     var poolData = results[0];
     var userData = results[1];
-
     if (poolData.code === 0) STATE.poolStatus = poolData.data;
     if (userData.code === 0) {
       STATE.userDrawCount = userData.data.draw_count;
       STATE.maxDraws = userData.data.max_draws;
     }
-
     updateUI();
   }).catch(function(e){
-    console.error('Status load error:', e);
+    console.error('Status error:', e);
   });
 }
 
@@ -184,86 +182,29 @@ function updateUI(){
 
   var hintEl = document.getElementById('poolHint');
   if (STATE.poolStatus && !STATE.poolStatus.has_prizes) {
-    hintEl.textContent = '⏰ 今日奖品已抽完';
+    hintEl.textContent = '今日奖品已抽完';
     hintEl.style.color = '#ef4444';
   } else {
-    hintEl.textContent = '🎯 奖品还有剩余';
+    hintEl.textContent = '奖品还有剩余';
     hintEl.style.color = '#10b981';
   }
 
-  // 更新抽奖按钮
-  var btn = document.getElementById('wheelBtn');
   if (remaining <= 0) {
-    btn.classList.add('disabled');
-    btn.textContent = '已用完';
-  } else {
-    btn.classList.remove('disabled');
-    btn.textContent = '抽奖';
+    document.querySelectorAll('.card-inner').forEach(function(el){ el.classList.add('disabled'); });
   }
-
 }
 
-// ====== 大转盘 ======
-var wheelAngle = 0;
-
-function drawWheel(){
-  var canvas = document.getElementById('wheelCanvas');
-  var ctx = canvas.getContext('2d');
-  var cx = 360, cy = 360, r = 340;
-  var segments = 8;
-  var arcSize = (2 * Math.PI) / segments;
-
-  ctx.clearRect(0, 0, 720, 720);
-
-  for (var i = 0; i < segments; i++) {
-    var startAngle = i * arcSize;
-    var endAngle = startAngle + arcSize;
-
-    // 扇形
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, startAngle, endAngle);
-    ctx.fillStyle = SEGMENT_COLORS[i];
-    ctx.fill();
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // 文字
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(startAngle + arcSize / 2);
-    ctx.textAlign = 'center';
-    ctx.fillStyle = i < 6 ? '#fff' : '#8d6e63';
-    ctx.font = i < 6 ? 'bold 30px "PingFang SC","Microsoft YaHei",sans-serif' : '24px "PingFang SC","Microsoft YaHei",sans-serif';
-    ctx.fillText(SEGMENT_LABELS[i], 210, 10);
-    ctx.restore();
-  }
-
-  // 中心装饰圆
-  var grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 70);
-  grad.addColorStop(0, '#fff');
-  grad.addColorStop(1, '#f5f5f5');
-  ctx.beginPath();
-  ctx.arc(cx, cy, 60, 0, 2 * Math.PI);
-  ctx.fillStyle = grad;
-  ctx.fill();
-}
-
-function spinWheel(){
+function flipCard(idx){
   if (STATE.isDrawing) return;
   var remaining = Math.max(0, STATE.maxDraws - STATE.userDrawCount);
   if (remaining <= 0) {
-    showToast('今日抽奖次数已用完');
+    showToast('今日翻牌次数已用完');
     return;
   }
 
   STATE.isDrawing = true;
-  var btn = document.getElementById('wheelBtn');
-  btn.classList.add('disabled');
-  btn.textContent = '...';
+  document.querySelectorAll('.card-inner').forEach(function(el){ el.classList.add('disabled'); });
 
-  // 先请求后端抽奖
   fetch(API_BASE+'/api/draw', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -275,29 +216,20 @@ function spinWheel(){
       showToast(data.message);
       STATE.isDrawing = false;
       loadStatus();
+      renderCards();
       return;
     }
     if (data.code !== 0) {
-      showToast(data.message || '抽奖失败');
+      showToast(data.message || '翻牌失败');
       STATE.isDrawing = false;
       loadStatus();
+      renderCards();
       return;
     }
 
     var result = data.data;
-
-    // 确定转盘停止位置：根据是否中奖选择对应扇区
-    var targetIdx;
-    if (result.won && result.prize.level === 1) targetIdx = 0;       // 20元券
-    else if (result.won && result.prize.level === 2) targetIdx = 1 + Math.floor(Math.random() * 2);  // 10元券在1,4
-    else if (result.won && result.prize.level === 3) targetIdx = 2 + Math.floor(Math.random() * 3);  // 小菜在2,3,5
-    else targetIdx = 6 + Math.floor(Math.random() * 2);              // 谢谢参与
-
-    // 确保至少转5圈
-    var targetAngle = targetIdx * (Math.PI / 4) + (Math.PI / 8); // 扇区中心角度
-    var totalRotation = (Math.PI * 2 * 5) + (Math.PI * 2 - targetAngle);
-
-    animateWheel(totalRotation, function(){
+    // 根据结果调度翻转动画
+    animateReveal(idx, result, function(){
       STATE.isDrawing = false;
       STATE.userDrawCount++;
       updateUI();
@@ -308,48 +240,63 @@ function spinWheel(){
     showToast('网络错误，请重试');
     STATE.isDrawing = false;
     loadStatus();
+    renderCards();
   });
 }
 
-function animateWheel(totalRotation, callback){
-  var canvas = document.getElementById('wheelCanvas');
-  var startAngle = wheelAngle;
-  var duration = 4000;
-  var startTime = null;
+function animateReveal(clickedIdx, result, callback){
+  // 先翻用户选的牌
+  var selectedEl = document.getElementById('card' + clickedIdx);
+  var shuffled = window._shuffled;
+  var realIdx;
 
-  function step(timestamp){
-    if (!startTime) startTime = timestamp;
-    var elapsed = timestamp - startTime;
-    var progress = Math.min(elapsed / duration, 1);
-    // ease-out 缓动
-    var eased = 1 - Math.pow(1 - progress, 4);
-    var angle = startAngle + totalRotation * eased;
-    wheelAngle = angle;
-
-    canvas.style.transform = 'rotate(' + angle + 'rad)';
-
-    if (progress < 1) {
-      requestAnimationFrame(step);
-    } else {
-      // 标准化角度
-      wheelAngle = angle % (Math.PI * 2);
-      canvas.style.transform = 'rotate(' + wheelAngle + 'rad)';
-      if (callback) callback();
-    }
+  // 在实际洗牌结果中找到匹配的卡片位置
+  if (result.won && result.prize.level === 1) {
+    // 找20元代金券的位置
+    realIdx = shuffled.findIndex(function(c){ return c.level === 1; });
+  } else if (result.won && result.prize.level === 2) {
+    // 找小菜的位置
+    realIdx = shuffled.findIndex(function(c){ return c.level === 2; });
+  } else {
+    // 找谢谢参与的位置
+    realIdx = shuffled.findIndex(function(c){ return !c.isWin; });
   }
 
-  requestAnimationFrame(step);
+  // 如果点中的卡恰好是正确位置，直接翻
+  // 如果不是，把选中位置的卡换成正确结果
+  if (clickedIdx !== realIdx && realIdx >= 0) {
+    shuffled[clickedIdx] = shuffled[realIdx];
+    // 更新那个位置的卡背
+    var cb = document.getElementById('card' + clickedIdx).querySelector('.card-back');
+    cb.querySelector('.c-icon').textContent = shuffled[clickedIdx].icon;
+    cb.querySelector('.c-name').textContent = shuffled[clickedIdx].name;
+    cb.className = 'card-back ' + (shuffled[clickedIdx].isWin ? 'win-card' : 'lose-card');
+  }
+
+  selectedEl.classList.add('flipped');
+
+  // 延迟后翻其他牌
+  setTimeout(function(){
+    for (var i = 0; i < 8; i++) {
+      if (i !== clickedIdx) {
+        (function(j){
+          setTimeout(function(){
+            document.getElementById('card' + j).classList.add('flipped');
+          }, (j < clickedIdx ? j : j - 1) * 150);
+        })(i);
+      }
+    }
+    // 全部翻完后显示结果
+    setTimeout(function(){ callback(); }, 1500);
+  }, 800);
 }
 
-// ====== 结果弹窗 ======
 function showResult(result){
   var overlay = document.getElementById('resultOverlay');
   var box = document.getElementById('resultBox');
   var icon = document.getElementById('resultIcon');
   var title = document.getElementById('resultTitle');
   var desc = document.getElementById('resultDesc');
-  var note = document.getElementById('resultNote');
-  var againBtn = document.getElementById('drawAgainBtn');
 
   overlay.classList.remove('hidden');
   box.className = 'result-box';
@@ -359,45 +306,30 @@ function showResult(result){
     icon.textContent = result.prize.icon || '🎉';
     title.textContent = '恭喜获得 ' + result.prize.name;
     title.className = 'result-title win';
-    desc.textContent = '到店出示本页面即可使用，请在今日营业时间内到店领取~';
+    desc.textContent = '到店出示本页面即可使用，3天内有效~';
   } else {
     icon.textContent = '😅';
     title.textContent = '谢谢参与';
-    title.className = 'result-title sunshine';
+    title.className = 'result-title lose';
     desc.textContent = '今天运气差一点，明天再来试试吧~';
-    if (result.message.indexOf('抽完') >= 0 || result.message.indexOf('抢光') >= 0) {
-      note.textContent = '⏰ 今日奖品已全部送出，明天10点再来！';
-    }
-  }
-
-  var remaining = Math.max(0, STATE.maxDraws - STATE.userDrawCount);
-  if (remaining > 0 && STATE.poolStatus && STATE.poolStatus.has_prizes) {
-    againBtn.style.display = 'inline-block';
-  } else {
-    againBtn.style.display = 'none';
   }
 }
 
 function closeResult(){
   document.getElementById('resultOverlay').classList.add('hidden');
+  renderCards();
+  loadStatus();
 }
 
 function showToast(msg){
   var t = document.createElement('div');
+  t.className = 'toast';
   t.textContent = msg;
-  t.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;padding:10px 22px;border-radius:8px;font-size:14px;z-index:200;pointer-events:none;transition:opacity .3s';
   document.body.appendChild(t);
   setTimeout(function(){ t.style.opacity = '0'; }, 1800);
   setTimeout(function(){ document.body.removeChild(t); }, 2200);
 }
 
-function changePhone(){
-  localStorage.removeItem('_luid');
-  localStorage.removeItem('_lphone');
-  window.location.href = '/';
-}
-
-// ====== 启动 ======
 init();
 </script>
 </body>
