@@ -133,6 +133,7 @@ var STATE = {
 
 // 奖品对应的轮盘颜色
 var API_BASE = 'https://api.taopaolucky.site';
+var SEGMENT_COLORS = ['#FF4444','#FF8C00','#FFB300','#FF6D00','#FF9800','#FFC107','#e0d5cc','#f0f0f0'];
 var SEGMENT_LABELS = ['20元券','10元券','小菜','小菜','10元券','小菜','谢谢参与','谢谢参与'];
 
 // ====== 初始化 ======
@@ -145,9 +146,6 @@ function init(){
     window.location.href = '/';
     return;
   }
-
-  document.getElementById('phoneText').textContent = STATE.phone ?
-    STATE.phone.substr(0,3) + '****' + STATE.phone.substr(-4) : '已登录';
 
   // 显示日期
   var d = new Date();
