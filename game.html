@@ -101,7 +101,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 </div>
 
 <script>
-var API_BASE = 'https://lottery-api.gesheng1993.workers.dev';
+var API_BASE = '';
 var STATE = {
   userId: '',
   poolStatus: null,
@@ -205,11 +205,7 @@ function flipCard(idx){
   STATE.isDrawing = true;
   document.querySelectorAll('.card-inner').forEach(function(el){ el.classList.add('disabled'); });
 
-  fetch(API_BASE+'/api/draw', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({user_id: STATE.userId})
-  })
+  fetch(API_BASE+'/api/draw?user_id=' + encodeURIComponent(STATE.userId))
   .then(function(r){ return r.json(); })
   .then(function(data){
     if (data.code === 429) {
@@ -236,8 +232,9 @@ function flipCard(idx){
       showResult(result);
     });
   })
-  .catch(function(){
-    showToast('网络错误，请重试');
+  .catch(function(err){
+    showToast('网络错误: ' + (err.message || '连接失败'));
+    console.error('Draw error:', err);
     STATE.isDrawing = false;
     loadStatus();
     renderCards();
